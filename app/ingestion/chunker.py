@@ -61,12 +61,14 @@ def sentence_chunker(
 
                     chunks.append(
                         {
-                            "chunk_id":chunk_id,
+                            "chunk_id": chunk_id,
+                            "document_id": doc["document_id"],
+                            "document_name": doc["document_name"],
                             "page_number": doc["page_number"],
-                            "strategy":"sentence",
+                            "strategy": "sentence",
                             "content": " ".join(current_chunk)
                         }
-                        )
+                    )
                     chunk_id+=1
                 current_chunk=[]
                 length=0
@@ -78,9 +80,11 @@ def sentence_chunker(
         
         chunks.append(
                 {
-                    "chunk_id":chunk_id,
+                    "chunk_id": chunk_id,
+                    "document_id": doc["document_id"],
+                    "document_name": doc["document_name"],
                     "page_number": doc["page_number"],
-                    "strategy":"sentence",
+                    "strategy": "sentence",
                     "content": " ".join(current_chunk)
                 }
                 )
@@ -113,13 +117,14 @@ def semantic_chunker(
                 current_chunk.append(sentences[i+1])
             else:
                 chunks.append(
-                    {
-                        "chunk_id":chunk_id,
-                        "page_number": doc["page_number"],
-                        "strategy":"semantic",
-                        "similarity_threshold": similarity_threshold,
-                        "content": " ".join(current_chunk)
-                    }
+                        {
+                            "chunk_id": chunk_id,
+                            "document_id": doc["document_id"],
+                            "document_name": doc["document_name"],
+                            "page_number": doc["page_number"],
+                            "strategy": "sentence",
+                            "content": " ".join(current_chunk)
+                        }
                     )
                 chunk_id+=1
                 current_chunk=[sentences[i+1]]
@@ -127,9 +132,11 @@ def semantic_chunker(
         if current_chunk:
             chunks.append(
                 {
-                    "chunk_id":chunk_id,
+                    "chunk_id": chunk_id,
+                    "document_id": doc["document_id"],
+                    "document_name": doc["document_name"],
                     "page_number": doc["page_number"],
-                    "strategy":"semantic",
+                    "strategy": "sentence",
                     "content": " ".join(current_chunk)
                 }
                 )

@@ -1,6 +1,8 @@
 import pdfplumber 
 import re
 import unicodedata
+import os
+import uuid
 
 def clean_text(text):
 
@@ -21,22 +23,30 @@ def clean_text(text):
 
 def load_pdf(pdf_path):
 
-    document=[]
+    document = []
+
+    
+    document_id = str(uuid.uuid4())
+    document_name = os.path.basename(pdf_path)
 
     with pdfplumber.open(pdf_path) as pdf:
 
-        for pg_no , page in enumerate(pdf.pages,start=1):
+        for pg_no, page in enumerate(pdf.pages, start=1):
 
-            text=page.extract_text(layout=True)
-            
+            text = page.extract_text(layout=True)
+
             if text:
-                cleaned_text=clean_text(text)
+
+                cleaned_text = clean_text(text)
+
                 document.append(
                     {
-                        "page_number":pg_no,
-                        "content":cleaned_text
+                        "document_id": document_id,
+                        "document_name": document_name,
+                        "page_number": pg_no,
+                        "content": cleaned_text
                     }
                 )
-    
+
     return document
-                
+

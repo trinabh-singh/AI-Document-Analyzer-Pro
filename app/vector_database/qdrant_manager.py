@@ -56,7 +56,9 @@ class QdrantManager:
                     "text": chunk["content"],
                     "chunk_id": chunk["chunk_id"],
                     "page_number": chunk["page_number"],
-                    "strategy": chunk["strategy"]
+                    "strategy": chunk["strategy"],
+                    "document_id": chunk["document_id"],
+                    "document_name": chunk["document_name"]
                 }
             )
             points.append(point)
