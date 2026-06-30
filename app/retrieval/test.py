@@ -1,18 +1,17 @@
-from app.retrieval.reranker import Reranker
+from app.retrieval.hybrid_retriever import HybridRetriever
 
-reranker = Reranker()
+retriever = HybridRetriever()
 
-question = "Who is Trinabh?"
+results = retriever.search(
+    "What are the skills?"
+)
 
-chunks = [
-    {"chunk": "Trinabh is an AI engineer."},
-    {"chunk": "Paneer Butter Masala costs 270."},
-    {"chunk": "Trinabh knows Python and Machine Learning."}
-]
 
-results = reranker.rerank(question, chunks, top_k=2)
+print("Dense Results:", len(dense_results))
+print("BM25 Results :", len(bm25_results))
+print("Hybrid Results:", len(combined_results))
+for result in results:
 
-for chunk in results:
-    print(chunk["rerank_score"])
-    print(chunk["chunk"])
-    print("-" * 40)
+    print(result["metadata"]["document_name"])
+    print(result["metadata"]["chunk_id"])
+    print("-" * 50)

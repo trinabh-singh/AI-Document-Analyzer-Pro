@@ -1,13 +1,13 @@
-from app.embeddings.embedding_service import EmbeddingService
 from app.vector_database.qdrant_manager import QdrantManager
 from app.generation.prompt import PromptBuilder
 from app.generation.llm_service import LLMService
 from app.retrieval.reranker import Reranker
+from app.retrieval.hybrid_retriever import  HybridRetriever
 class RAGPipeline:
 
     def __init__(self):
 
-        self.embedding_service = EmbeddingService()
+        self.hybrid_retriever = HybridRetriever()
 
         self.qdrant = QdrantManager()
 
@@ -21,11 +21,14 @@ class RAGPipeline:
     
     def ask(self, question):
 
-        query_embedding = self.embedding_service.embed_query(question)
 
-        retrieved_chunks = self.qdrant.search(query_embedding.tolist(),limit=self.top_k)
+        retrieved_chunks = self.hybrid_retriever.search(question,dense_top_k=self.top_k,bm25_top_k=self.top_k)
 
         reranked_chunks = self.reranker.rerank(question,retrieved_chunks,top_k=5)
+        print("\nAfter Hybrid Retrieval\n")
+        for chunk in retrieved_chunks:
+            print(chunk["metadata"]["document_name"])
+            print(chunk["metadata"]["chunk_id"])
 
         print("\nAfter Reranking\n")
 
@@ -55,6 +58,8 @@ if __name__ == "__main__":
 
     answer = rag.ask(question)
 
+
+    
     print("\nAnswer:\n")
     print(answer["answer"])
 

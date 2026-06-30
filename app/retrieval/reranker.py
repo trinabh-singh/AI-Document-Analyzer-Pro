@@ -33,4 +33,10 @@ class Reranker:
             reverse=True
         )
 
-        return reranked_chunks[:top_k]
+        filtered_chunks = [
+            chunk
+            for chunk in reranked_chunks
+            if chunk["rerank_score"] > 0
+        ]
+
+        return filtered_chunks[:top_k]
