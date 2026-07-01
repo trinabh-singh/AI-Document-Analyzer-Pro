@@ -12,6 +12,7 @@ class LLMService:
             api_key=os.getenv("OPENROUTER_API_KEY"),
             base_url="https://openrouter.ai/api/v1"
         )
+        print("API Key:", os.getenv("OPENROUTER_API_KEY"))
 
     def generate(self, prompt):
 
@@ -24,5 +25,15 @@ class LLMService:
                 }
             ]
         )
+
+        print("\n===== LLM RESPONSE =====")
+        print(response)
+        print("========================\n")
+
+        if response.choices is None:
+            raise Exception(f"Model returned no choices:\n{response}")
+
+        if len(response.choices) == 0:
+            raise Exception("Model returned an empty choices list.")
 
         return response.choices[0].message.content

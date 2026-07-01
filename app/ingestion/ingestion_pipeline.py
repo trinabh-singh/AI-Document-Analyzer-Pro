@@ -6,40 +6,51 @@ import os
 import pickle
 
 
-embedding_service = EmbeddingService()
-qdrant = QdrantManager()
-qdrant.delete_collection()
-qdrant.create_collection(vector_size=384)
-DATA_FOLDER = "app/data"
-pdf_files = [
-    file
-    for file in os.listdir(DATA_FOLDER)
-    if file.lower().endswith(".pdf")
-]
+def ingest_documents(pdf_files):
 
-all_chunks=[]
+    embedding_service = EmbeddingService()
+    qdrant = QdrantManager()
 
-for pdf_file in pdf_files:
+    # Rebuild the collection
+    qdrant.delete_collection()
+    qdrant.create_collection(vector_size=384)
 
-    pdf_path = os.path.join(DATA_FOLDER, pdf_file)
+    all_chunks = []
 
-    print(f"\nProcessing {pdf_file}")
+    for pdf_path in pdf_files:
 
-    pages = load_pdf(pdf_path)
+        print(f"\nProcessing {os.path.basename(pdf_path)}")
 
-    chunks = sentence_chunker(pages)
-    all_chunks.extend(chunks)
+        pages = load_pdf(pdf_path)
 
-    embeddings = embedding_service.embed_documents(chunks)
+        chunks = sentence_chunker(pages)
+        all_chunks.extend(chunks)
 
-    qdrant.upload_documents(
-        embeddings,
-        chunks
-    )
-    
-os.makedirs("app/storage", exist_ok=True)
+        embeddings = embedding_service.embed_documents(chunks)
 
-with open("app/storage/chunks.pkl", "wb") as file:
-    pickle.dump(all_chunks, file)
+        qdrant.upload_documents(
+            embeddings,
+            chunks
+        )
 
-print(f"\nSaved {len(all_chunks)} chunks to app/storage/chunks.pkl")
+    os.makedirs("app/storage", exist_ok=True)
+
+    with open("app/storage/chunks.pkl", "wb") as file:
+        pickle.dump(all_chunks, file)
+
+    print(f"\nSaved {len(all_chunks)} chunks.")
+
+    return len(all_chunks)
+
+
+if __name__ == "__main__":
+
+    DATA_FOLDER = "app/data"
+
+    pdf_files = [
+        os.path.join(DATA_FOLDER, file)
+        for file in os.listdir(DATA_FOLDER)
+        if file.lower().endswith(".pdf")
+    ]
+
+    ingest_documents(pdf_files)
