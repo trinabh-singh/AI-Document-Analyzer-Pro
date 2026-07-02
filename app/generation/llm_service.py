@@ -17,7 +17,7 @@ class LLMService:
     def generate(self, prompt):
 
         response = self.client.chat.completions.create(
-            model="nvidia/nemotron-3-super-120b-a12b:free",
+            model="GPT-OSS-120B",
             messages=[
                 {
                     "role": "user",
@@ -35,5 +35,7 @@ class LLMService:
 
         if len(response.choices) == 0:
             raise Exception("Model returned an empty choices list.")
+
+        print(response.model_dump())
 
         return response.choices[0].message.content

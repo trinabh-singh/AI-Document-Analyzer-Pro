@@ -37,7 +37,7 @@ class HybridRetriever:
 
         for rank, result in enumerate(dense_results, start=1):
 
-            chunk_id = result["metadata"]["chunk_id"]
+            chunk_id = (result["metadata"]["document_id"],result["metadata"]["chunk_id"])
 
             rrf_score = 1 / (k + rank)
 

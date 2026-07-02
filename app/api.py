@@ -56,15 +56,26 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         "chunks_created": total_chunks
     }
 
-
 @app.post("/query")
 def query(request: QueryRequest):
-    
+
+    global rag
+
     if rag is None:
         return {
             "error": "Please upload documents first."
         }
 
-    
-    result = rag.ask(request.question)
-    return result 
+    try:
+        result = rag.ask(request.question)
+        return result
+
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+
+        return {
+            "error": str(e),
+            "type": type(e).__name__
+        }
