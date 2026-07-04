@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi import UploadFile, File
-from typing import List
+from typing import Annotated
 import os
 import shutil
 from app.ingestion.ingestion_pipeline import ingest_documents
@@ -26,7 +26,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 @app.post("/upload")
-async def upload_pdfs(files: List[UploadFile] = File(...)):
+async def upload_pdfs(files: Annotated[List[UploadFile], File(...)]):
     global rag
     uploaded = []
     pdf_paths=[]
