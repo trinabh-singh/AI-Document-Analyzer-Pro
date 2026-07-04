@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-qdrant-client
-sentence-transformers
-pypdf
-python-dotenv
-python-multipart

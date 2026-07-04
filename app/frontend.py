@@ -1,10 +1,11 @@
 import streamlit as st
 import requests
+import os 
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv("API_URL", "http://backend:8000")
 
 st.set_page_config(
-    page_title="Production RAG Assistant",
+    page_title="AI Document Analyzer Pro",
     page_icon="🤖",
     layout="wide"
 )
@@ -76,17 +77,64 @@ if "chat_history" not in st.session_state:
 with st.sidebar:
 
     st.title("📊 Analytics")
+    evaluation = {
+        "faithfulness":0,
+        "answer_relevancy":0,
+        "context_precision":0,
+        "context_recall":0
+    }
+    
+    if st.session_state.chat_history:
 
-    st.markdown("Coming Soon...")
+        latest = st.session_state.chat_history[-1]
+
+        evaluation = latest.get("evaluation", evaluation)
+        def show_metric(title, score):
+
+            score = float(score)
+
+            if score >= 0.85:
+                icon = "🟢"
+            elif score >= 0.60:
+                icon = "🟡"
+            else:
+                icon = "🔴"
+
+            st.write(f"**{icon} {title}**")
+            st.progress(score)
+            st.caption(f"{score*100:.1f}%")
+
+        faithfulness = float(evaluation.get("faithfulness", 0))
+        answer_relevancy = float(evaluation.get("answer_relevancy", 0))
+        context_precision = float(evaluation.get("context_precision", 0))
+        context_recall = float(evaluation.get("context_recall", 0))
+
+        show_metric("Faithfulness", faithfulness)
+        show_metric("Answer Relevancy", answer_relevancy)
+        show_metric("Context Precision", context_precision)
+        show_metric("Context Recall", context_recall)
+        
+        overall = (
+            faithfulness +
+            answer_relevancy +
+            context_precision +
+            context_recall
+        ) / 4
+
+        st.metric(
+            "⭐ Overall RAG Score",
+            f"{overall*100:.1f}%"
+        )
 
     st.divider()
+    
 
     st.metric("Documents", len(st.session_state.uploaded_files))
     st.metric("Chunks", st.session_state.chunks)
 
 # -------------------- Header --------------------
 
-st.title("🤖 Production RAG Assistant")
+st.title("🤖 AI Document Analyzer Pro")
 
 st.caption(
     "Hybrid Retrieval • BM25 • Dense Embeddings • Cross Encoder • FastAPI • Qdrant"
@@ -173,12 +221,13 @@ if st.button("📤 Upload PDFs"):
         if response.status_code == 200:
 
             data = response.json()
-
+            
             st.success("✅ Documents indexed successfully!")
 
             st.session_state.uploaded_files = data["files"]
             st.session_state.chunks = data["chunks_created"]
             st.session_state.chat_history = []
+            
 
         else:
 
@@ -220,24 +269,29 @@ if st.button("🚀 Generate Answer"):
 
             else:
 
-                st.divider()
+                evaluation = data.get("evaluation", {})
 
                 st.session_state.chat_history.append({
                     "question": question,
                     "answer": data["answer"],
-                    "sources": data.get("chunks", [])
+                    "sources": data.get("chunks", []),
+                    "evaluation": evaluation
                 })
 
-                st.markdown(
-                    f"""
-<div class="answer-box">
+            st.divider()
 
-{data["answer"]}
+            st.markdown(
+                f"""
+        <div class="answer-box">
 
-</div>
-""",
-                    unsafe_allow_html=True,
-                )
+        {data["answer"]}
+
+        </div>
+        """,
+                unsafe_allow_html=True,
+            )
+
+            st.rerun()
 
                 # ---------------- Sources ----------------
 
@@ -266,7 +320,7 @@ if st.button("🚀 Generate Answer"):
 
             st.error("Backend did not return valid JSON.")
             st.code(response.text)
-for chat in st.session_state.chat_history:
+for chat in reversed(st.session_state.chat_history):
 
     with st.chat_message("user"):
         st.write(chat["question"])
@@ -294,9 +348,11 @@ for chat in st.session_state.chat_history:
                         st.caption(
                             f"Reranker Score: {chunk['rerank_score']:.2f}"
                         )
-
+if st.button("🗑️ Clear Chat"):
+    st.session_state.chat_history = []
+    st.rerun()
 st.divider()
 
 st.caption(
-    "Built with ❤️ using FastAPI, Qdrant, Hybrid Retrieval, Cross Encoder and OpenRouter"
+    "AI Document Analyzer Pro : FastAPI • Streamlit • Qdrant • Hybrid Retrieval • BM25 • Dense Embeddings • Cross Encoder • OpenRouter • RAG Evaluation"
 )

@@ -3,11 +3,13 @@ from app.generation.prompt import PromptBuilder
 from app.generation.llm_service import LLMService
 from app.retrieval.reranker import Reranker
 from app.retrieval.hybrid_retriever import  HybridRetriever
+from app.evaluation.eval import RAGASEvaluator
 class RAGPipeline:
 
     def __init__(self):
 
         self.hybrid_retriever = HybridRetriever()
+        self.evaluator = RAGASEvaluator()
 
         self.qdrant = QdrantManager()
 
@@ -44,10 +46,18 @@ class RAGPipeline:
 
         answer = self.llm.generate(prompt)
         
+        contexts = [chunk["chunk"] for chunk in reranked_chunks]
 
+        evaluation = self.evaluator.evaluate(
+            question=question,
+            answer=answer,
+            contexts=contexts
+        )
+        
         return {
                 "answer": answer,
-                "chunks": reranked_chunks 
+                "chunks": reranked_chunks,
+                "evaluation": evaluation
                 }
     
 if __name__ == "__main__":

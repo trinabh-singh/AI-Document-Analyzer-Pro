@@ -1,0 +1,49 @@
+# -------------------------
+# Backend Framework
+# -------------------------
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+requests
+
+# -------------------------
+# PDF Processing
+# -------------------------
+pdfplumber
+pymupdf
+
+# -------------------------
+# AI / NLP
+# -------------------------
+sentence-transformers
+transformers
+openai
+
+# -------------------------
+# Vector Database
+# -------------------------
+qdrant-client
+
+# -------------------------
+# Hybrid Retrieval
+# -------------------------
+rank-bm25
+
+# -------------------------
+# Data Processing
+# -------------------------
+numpy
+pandas
+scikit-learn
+
+# -------------------------
+# Evaluation
+# -------------------------
+ragas
+datasets
+
+# -------------------------
+# NLP Utilities
+# -------------------------
+nltk
