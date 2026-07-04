@@ -10,23 +10,39 @@ import uuid
 class QdrantManager:
 
     def __init__(
-        self,
-        host=None,
-        port=None,
-        collection_name="documents"
+    self,
+    collection_name="documents"
     ):
 
-        host = host or os.getenv("QDRANT_HOST", "qdrant")
-        port = port or int(os.getenv("QDRANT_PORT", 6333))
+        qdrant_url = os.getenv("QDRANT_URL")
+        qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
-        self.client = QdrantClient(
-            host=host,
-            port=port,
-            timeout=60
-        )
+        # Cloud
+        if qdrant_url:
+            print("Using Qdrant Cloud")
+
+            self.client = QdrantClient(
+                url=qdrant_url,
+                api_key=qdrant_api_key,
+                timeout=60
+            )
+
+        # Local Docker
+        else:
+            print("Using Local Qdrant")
+
+            host = os.getenv("QDRANT_HOST", "qdrant")
+            port = int(os.getenv("QDRANT_PORT", 6333))
+
+            self.client = QdrantClient(
+                host=host,
+                port=port,
+                timeout=60
+            )
 
         self.collection_name = collection_name
 
+    
     def create_collection(self, vector_size: int = 384):
     
         if self.client.collection_exists(collection_name=self.collection_name):
