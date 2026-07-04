@@ -26,7 +26,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 @app.post("/upload")
-async def upload_pdfs(files: Annotated[List[UploadFile], File(...)]):
+async def upload_pdfs(files: Annotated[list[UploadFile], File(...)]):
     global rag
     uploaded = []
     pdf_paths=[]
